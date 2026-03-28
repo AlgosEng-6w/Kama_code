@@ -1,35 +1,28 @@
 class Solution {
 public:
     string minWindow(string s, string t) {
-        int diff[128]{};
-        int kinds = 0;
-        for (char c : t) {
-            if (diff[c] == 0) kinds++;
-            diff[c]--;
+        vector<int>diff(128,0);
+        int count = 0, ans_left = 0, ans_right = s.size();
+        for (int i = 0; i < t.size(); i++) {
+            if (diff[t[i]]-- == 0) count++;
         }
+        for (int right = 0, left = 0; right < s.size(); right++) {
+            if (++diff[s[right]] == 0) {
+                count--;
+            }
 
-        int m = s.size();
-        int ans_left = -1, ans_right = m;
-        int ge_cnt = 0, left = 0;
-
-        for (int right = 0; right < m; right++) {
-            char c = s[right];
-            diff[c]++;
-            if (diff[c] == 0) ge_cnt++;
-
-            while (ge_cnt == kinds) {
-                if (right - left < ans_right - ans_left) {
-                    ans_left = left;
+            while (count == 0) {
+                if (ans_right - ans_left > right - left) {
                     ans_right = right;
+                    ans_left = left;
                 }
 
-                char x = s[left];
-                if (diff[x] == 0) ge_cnt--;
-                diff[x]--;
+                if (diff[s[left]]-- == 0) count++;
                 left++;
             }
+            
         }
-
-        return ans_left < 0 ? "" : s.substr(ans_left, ans_right - ans_left + 1);
+        if (ans_right == s.size()) return "";
+        return s.substr(ans_left, ans_right-ans_left+1);
     }
 };
